@@ -1,0 +1,20 @@
+
+Feature 1- To check the availibality of Seminar hall and Book
+1.Selection of seminar hall
+Old Seminar Hall
+New Seminar Hall
+
+
+2.Check the database for availbale slots in a week by date.
+
+3.Number hours required by th user for the event.
+
+4.If the Required Slot is free Take the details of the User
+
+5. Book the slot by adding the details of user and purpose of booking
+
+Feature 2-To know who has booked the Particular slot
+
+Feature 3-Check in and check out of the Seminar hall
+
+Feature 4-Maintainance review of every session (Given by users of next session)
