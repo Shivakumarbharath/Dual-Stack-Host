@@ -1,0 +1,15 @@
+Info about all the header files needed for socket programming
+
+stdio.h---This Header file contains declarations used in most input and output and is typically included in all C programs
+
+
+sys/types.h---This Header file contains definitions of a numver of data types used in system calls
+
+sys/socket.h---The header file socket.h includes a number of definations ofstructures needed for sockets eg soxkaddr
+
+
+netinet/in.h---This header file in.h contains constants and structures needed fro internet domain addresses eg.soxkadde_in 
+
+stdlib.h---This header defines four variable types,several macros and various functions for performing general functions
+
+int atoi(const char *)--converts the string pointed to type int

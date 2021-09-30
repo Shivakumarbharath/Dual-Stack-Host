@@ -1,0 +1,39 @@
+Server                     client
+Socket()        >           Socket()
+Bind()             
+listen()              
+accept()        <           connection()
+read()          <           write()
+write()         >           read()
+close()         <>           close()
+
+
+int sockfd=socket(int domain, int type, int protocol)
+domain---AF_INET-IPv4
+type-
+SOCK_STREAM-TCP
+SOCK_DCRAM-UDP
+protocol-0
+
+int bind(int sockfd,const struct sockaddr *addr,socklen_t addrlen)
+
+struct sockaddr {
+sa_family_t sa_family;
+char sa_data[14];
+}
+
+
+int listen(int sockdf,int backlog)
+backlog-number of clients server can handle at the same time
+
+newsockfd= acceptsockfd, (struct sockaddr *)&addr,&addrlen)
+newsockfd will have a integet on succesfull acception
+
+int connect(int sockfd,const struct ssockaddr *addr, socklen_t addrlen)
+0 for success 
+-1 for failure
+
+int read( newsockfd,buffer,buffer_size)
+int write(nrewsockfd,buffer,buffer_size)
+
+send and recieve functions are also available
