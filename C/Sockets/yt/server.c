@@ -54,8 +54,9 @@ main (int argc, char *argv[])
       n = read (newsockfd, buffer, sizeof (buffer));
       if (n < 0)
 	error ("Error while reading");
-      printf ("Client :%s\n", buffer);
+      printf ("Server Recieved :%s\n", buffer);
       bzero (buffer, 255);
+      printf("Server Sent : ");
       fgets (buffer, 255, stdin);
       n = write (newsockfd, buffer, strlen (buffer));
       if (n < 0)

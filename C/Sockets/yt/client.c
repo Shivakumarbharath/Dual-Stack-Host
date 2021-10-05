@@ -54,6 +54,7 @@ main (int argc, char *argv[])
   while (1)
     {
       bzero (buffer, 255);
+      printf("Client Sent: ");
       fgets (buffer, 255, stdin);
       n = write (sockfd, buffer, strlen (buffer));
       if (n < 0)
@@ -62,7 +63,7 @@ main (int argc, char *argv[])
       n = read (sockfd, buffer, 255);
       if (n < 0)
 	error ("Reading Failed");
-      printf ("Server: %s", buffer);
+      printf ("Client Recieved : %s", buffer);
       int i = strncmp ("bye", buffer, 3);
       if (i == 0)
 	break;
