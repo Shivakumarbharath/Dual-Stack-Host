@@ -31,8 +31,8 @@ main (int argc, char *argv[])
   int size=255;
   struct sockaddr_in6 serv_addr;
 
-if(argc<2)error("Usage Filename <Ip Address of Server>");
-portno=5000;
+if(argc<3)error("Usage Filename <Ip Address of Server> <Portnumber of server>");
+portno=atoi(argv[2]);
   cli_sock = socket (AF_INET6, SOCK_STREAM, 0);
   if (cli_sock < 0)
     {
@@ -52,7 +52,7 @@ serv_addr.sin6_port = htons (portno);
 printf("Connected to server successfully\n\n");
 
 bzero(recvbuffer,255);
-strcpy(recvbuffer,"Hello");
+fgets(recvbuffer,sizeof(recvbuffer),stdin);
 n=write(cli_sock,recvbuffer,sizeof(recvbuffer));
 if(n<0)error("Error while Communication");
 printf("Client  sent to server %s : %s\n",argv[1],recvbuffer);
@@ -68,7 +68,8 @@ printf("Client Received from server %s : %s\n",argv[1],recvbuffer);
 //print time recieved
 printf("Received Time =%s\n\n",Time());
 
-close(cli_sock);
+int c = close(cli_sock);
+if(c!=0){error("Error Closing");c=close(cli_sock);if(c==0)printf("Socket closed");}
 return 0;
 
 }

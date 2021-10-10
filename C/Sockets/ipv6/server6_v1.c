@@ -19,10 +19,17 @@ exit(1);
 }
 
 //Main function
-int main(){
+int main(int argc, char *argv[]){
+
+if(argc<2)error("Usage Filename <Port Number of Server>");
+
+
+
+
+
 //declare variable for server socket,accepted client connection and portnumber
 int ser_sock,cli_sock,portno;
-portno=5000;
+//portno=5000;
 //declare varble to send and receieve message
 char buffer[255];
 //To store the ip address of client
@@ -40,7 +47,7 @@ bzero((char *)&serv_addr,sizeof(serv_addr));
 
 //Load the port number and server address into the structure
 serv_addr.sin6_family=AF_INET6;
-serv_addr.sin6_port=htons(portno);
+serv_addr.sin6_port=htons(atoi(argv[1]));
 serv_addr.sin6_addr=in6addr_any;
 
 //Bind the socket to address of the server and check if successfull
@@ -72,8 +79,9 @@ printf("Recieced Time =%s\n\n",Time());
 
 sleep(2);
 //Send back ack
-bzero(buffer,sizeof(buffer));
-strcpy(buffer,"Hello -ack");
+//bzero(buffer,sizeof(buffer));
+char k[]=" -ack";
+strncat(buffer,k,sizeof(k));
 n=write(cli_sock,buffer,sizeof(buffer));
 if(n<0)error("Error while Communication");
 printf("Server sent to client %s : %s\n",ip,buffer);
