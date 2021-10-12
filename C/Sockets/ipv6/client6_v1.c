@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <time.h>
+#include <net/if.h>
 char *Time(){
  time_t t;
  time(&t);
@@ -41,6 +42,7 @@ portno=atoi(argv[2]);
 printf("Socket Created Successfully\n\n");
 serv_addr.sin6_family = AF_INET6;
 serv_addr.sin6_port = htons (portno);
+serv_addr.sin6_scope_id=if_nametoindex("enp4s0");
 //serv_addr.sin6_addr=inet_addr(argv[1]);
     if(inet_pton(AF_INET6, argv[1], &serv_addr.sin6_addr)<=0)
     {
