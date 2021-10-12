@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include <arpa/inet.h>//to use inet ntoa(struct in_addr)to convert struct to ip address
 #include <time.h>
+#include <net/if.h>
+
+
 //Funtion to display error if any event fails
 char *Time(){
 time_t t;
@@ -44,11 +47,22 @@ if(ser_sock<0){error("Error in Socket creation");}
 printf("Socket Created Successfully\n\n");
 //clear the contents in the declared variable
 bzero((char *)&serv_addr,sizeof(serv_addr));
+int opt=1;
+
+/*if (setsockopt(ser_sock, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
+                                                  &opt, sizeof(opt))) 
+    { 
+        perror("setsockopt"); 
+        exit(EXIT_FAILURE); 
+    } 
+*/
+
 
 //Load the port number and server address into the structure
 serv_addr.sin6_family=AF_INET6;
 serv_addr.sin6_port=htons(atoi(argv[1]));
 serv_addr.sin6_addr=in6addr_any;
+serv_addr.sin6_scope_id=if_nametoindex("enp4s0");
 
 //Bind the socket to address of the server and check if successfull
 if(bind(ser_sock,(struct sockaddr *)&serv_addr,sizeof(serv_addr))<0)error("Error while Binding the socket");
