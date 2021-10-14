@@ -7,6 +7,17 @@
 #include <unistd.h>
 #include <arpa/inet.h>//to use inet ntoa(struct in_addr)to convert struct to ip address
 #include <time.h>
+
+
+//Function to display the introduction
+void disp(){
+
+printf("\t\tServer using IPv4 Protocol on Dual Stack Host\n\n");
+}
+
+
+
+
 //Funtion to display error if any event fails
 char *Time(){
 time_t t;
@@ -20,6 +31,7 @@ exit(1);
 
 //Main function
 int main(){
+disp();
 //declare variable for server socket,accepted client connection and portnumber
 int ser_sock,cli_sock,portno,n;
 portno=5000;

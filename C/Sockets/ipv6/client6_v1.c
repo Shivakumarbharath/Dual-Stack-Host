@@ -9,6 +9,15 @@
 #include <string.h>
 #include <time.h>
 #include <net/if.h>
+
+void disp(){
+
+printf("\t\tClient runnnig on IPv6 ONLY  Host\n\n");
+}
+
+
+
+
 char *Time(){
  time_t t;
  time(&t);
@@ -33,6 +42,7 @@ main (int argc, char *argv[])
   struct sockaddr_in6 serv_addr;
 
 if(argc<3)error("Usage Filename <Ip Address of Server> <Portnumber of server>");
+disp();
 portno=atoi(argv[2]);
   cli_sock = socket (AF_INET6, SOCK_STREAM, 0);
   if (cli_sock < 0)

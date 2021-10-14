@@ -11,6 +11,15 @@
 
 
 //Funtion to display error if any event fails
+
+//Function to display the introduction
+void disp(){
+
+printf("\t\tServer using IPv6 Protocol on Dual Stack Host\n\n");
+}
+
+
+
 char *Time(){
 time_t t;
 time(&t);
@@ -26,7 +35,7 @@ int main(int argc, char *argv[]){
 
 if(argc<2)error("Usage Filename <Port Number of Server>");
 
-
+disp();
 
 
 

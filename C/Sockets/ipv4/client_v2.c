@@ -8,6 +8,14 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <time.h>
+
+void disp(){
+
+printf("\t\tServer using IPv4 Protocol on Dual Stack Host\n\n");
+}
+
+
+
 char *Time(){
  time_t t;
  time(&t);
@@ -24,7 +32,7 @@ int
 main (int argc, char *argv[])
 {				//to take the arguments from the command line
 
-
+disp();
   int cli_sock, portno, n;
   char buffer[255];
   char recvbuffer2[255];

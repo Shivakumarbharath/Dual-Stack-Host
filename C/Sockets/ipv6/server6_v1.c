@@ -9,6 +9,13 @@
 #include <time.h>
 #include <net/if.h>
 
+//Function to display the introduction
+void disp(){
+
+printf("\t\tServer using IPv6 Protocol on Dual Stack Host\n\n");
+}
+
+
 
 //Funtion to display error if any event fails
 char *Time(){
@@ -25,7 +32,7 @@ exit(1);
 int main(int argc, char *argv[]){
 
 if(argc<2)error("Usage Filename <Port Number of Server>");
-
+disp();
 
 
 
