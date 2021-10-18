@@ -12,9 +12,9 @@
 #include <net/if.h>
 
 void disp(){
-14 
-15 printf("\t\tClient runnnig on IPv6 ONLY  Host\n\n");
-16 }
+ 
+ printf("\t\tClient runnnig on IPv6 ONLY  Host\n\n");
+ }
 
 
 char *Time(){
