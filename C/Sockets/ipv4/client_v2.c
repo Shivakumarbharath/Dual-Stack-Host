@@ -11,7 +11,7 @@
 
 void disp(){
 
-printf("\t\tServer using IPv4 Protocol on Dual Stack Host\n\n");
+printf("\t\tClient Running on IPv4 ONLY Host\n\n");
 }
 
 
