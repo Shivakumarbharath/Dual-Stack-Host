@@ -8,6 +8,10 @@
 #include <arpa/inet.h>//to use inet ntoa(struct in_addr)to convert struct to ip address
 #include <time.h>
 
+typedef struct Message{
+char name[15];
+char contact[10];
+}msg;
 //Function to display the introduction
 void disp(){
 
@@ -74,10 +78,11 @@ printf("ipv4 Address : %s\t",ip);
 printf("Port number %d\n\n\n\n",client_addr.sin_port);
 //Read from client
 int n;
+msg Recv;
 bzero(buffer,sizeof(buffer));
-n=read(cli_sock,buffer,255);
+n=recv(cli_sock,(msg *)&Recv,sizeof(Recv),0);
 if(n<0)error("Error while Communication");
-printf("Server Received from client %s : %s\n",ip,buffer);
+printf("Server Received from client %s : %s\t contact %s",ip,Recv.name,Recv.contact);
 //print time recieved
 printf("Recieced Time =%s\n\n",Time());
 
@@ -85,7 +90,7 @@ sleep(2);
 //Send back ack
 bzero(buffer,sizeof(buffer));
 strcpy(buffer,"Hello -ack");
-n=write(cli_sock,buffer,sizeof(buffer));
+n=send(cli_sock,buffer,sizeof(buffer),0);
 if(n<0)error("Error while Communication");
 printf("Server sent to client %s : %s\n",ip,buffer);
 //Print time sent
