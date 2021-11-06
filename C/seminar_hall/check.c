@@ -89,13 +89,18 @@ int
 main ()
 {
 
-  request req;
-  det con;
+  
   full arr[10];
+int i=0;
+while(1)
+{
 
+request req;
+det con;
   printf
-    ("\t\tWELCOME TO SEMINAR HALL BOOKING APP\n\tChoose the following\n1.Booking\n2.Cancelling\n3.Rescheduling\n\n\nchoice? :");
+    ("\t\tWELCOME TO SEMINAR HALL BOOKING APP\n\tChoose the following\n1.Booking\n2.Cancelling\n3.Rescheduling\n4.Exit\n\n\nchoice? :");
   scan (&req.type);
+  if (req.type==4)exit(0);
   //while ((getchar()) != '\n');
   switch (req.type -= 1)
   {
@@ -148,8 +153,8 @@ case 0:
       printf ("Contact Number : ");
       fgets (con.contact, sizeof (con.contact), stdin);
 
-      arr[0].r =  req;
-      arr[0].contacts=con;
+      arr[i].r =  req;
+      arr[i].contacts=con;
 //Completed
       printf ("Booking Successfull\n");
       break;
@@ -166,7 +171,7 @@ default:
 
 
 
-Display(arr[0]);
+Display(arr[i]);
 
 
 
@@ -174,7 +179,7 @@ Display(arr[0]);
 
 
 
-
+}
 
 
 

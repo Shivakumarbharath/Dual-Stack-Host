@@ -8,35 +8,89 @@
 #include <arpa/inet.h>//to use inet ntoa(struct in_addr)to convert struct to ip address
 #include <time.h>
 
-struct s_day{
-time_t Date;//Date of Booking
-int no_of_slots;
-int first_slot_number;
+
+
+void scan(int *p){
+scanf("%d",p);
+while ((getchar()) != '\n');
+return;
+}
+struct s_day
+{
+  struct tm Date;		//Date of Booking
+  int no_of_slots;
+  int first_slot_number;
 /*if more than one slot than booking can be done for continues slots only*/
 };
 
-struct m_day{
-time_t dates[6];
-int no_of_slots_each_day;
-int first_slot_number;};
 
-typedef struct request{
-int type;/*0 - booking 
-		1 - cancelling 
-		2 - Rescheduling*/
-int hall;/* 0 – old seminar hall
-	       1 – new seminar hall*/
-int B_day;/*0 - single day
-            1- Multiple day*/
-union no_of_days{
-struct s_day one_day;
-struct m_day multiple_days;} booking_days;
-}request;
+struct m_day
+{
+  struct tm dates[6];
+  int no_of_slots_each_day;
+  int first_slot_number;
+};
 
-typedef struct details{
-char name[15];
-char contact[10];
-}det;
+
+
+
+
+typedef struct request
+{
+  int type;			/*0 - booking 
+				   1 - cancelling 
+				   2 - Rescheduling */
+  int hall;			/* 0 – old seminar hall
+				   1 – new seminar hall */
+  int B_day;			/*0 - single day
+				   1- Multiple day */
+  union no_of_days
+  {
+    struct s_day one_day;
+    struct m_day multiple_days;
+  } booking_days;
+} request;
+
+
+
+typedef struct details
+{
+  char name[20];
+  char contact[11];
+} det;
+
+
+   typedef struct full
+    {
+      request r;
+      det contacts;
+    }full; 
+
+void Display(full user){
+printf("\n\n\n");
+if (user.r.type==0)printf("The Type of Service Requested is Booking\n");
+if (user.r.type==1)printf("The Type of Service Requested is Cancelling\n");
+if (user.r.type==2)printf("The Type of Service Requested is Rescheduling\n");
+
+
+user.r.hall?printf("Seminar Hall : New Seminar Hall\n"):printf("Seminar Hall : Old Seminar hall\n");
+user.r.B_day?printf("Booking Type : Multiple Day\n"):printf("Booking Type : Single Day\n");
+
+if (user.r.B_day==0){
+printf("Date Booked %d-%d-%d\n",user.r.booking_days.one_day.Date.tm_mday,user.r.booking_days.one_day.Date.tm_mon,user.r.booking_days.one_day.Date.tm_year);
+printf("No of Slots Booked : %d\n",user.r.booking_days.one_day.no_of_slots);
+printf("Event Starts from Slot Number : %d\n",user.r.booking_days.one_day.first_slot_number);
+}
+//else for multiple days
+
+printf("Booked by : %s",user.contacts.name);
+printf("Contact Number : %s\n",user.contacts.contact);
+
+return;
+}
+
+
+
 //Function to display the introduction
 void disp(){
 
@@ -103,21 +157,25 @@ printf("ipv4 Address : %s\t",ip);
 printf("Port number %d\n\n\n\n",client_addr.sin_port);
 //Read from client
 int n;
-det Recv;
-bzero(buffer,sizeof(buffer));
-n=recv(cli_sock,(det *)&Recv,sizeof(Recv),0);
-if(n<0)error("Error while Communication");
-printf("Server Received from client %s : %s\t contact %s",ip,Recv.name,Recv.contact);
-//print time recieved
-printf("Recieced Time =%s\n\n",Time());
+full Recv;
+n=recv(cli_sock,(full *)&Recv,sizeof(Recv),0);
+if(n<0)error("Error while Recieving information");
+Display(Recv);
 
-sleep(2);
-//Send back ack
-bzero(buffer,sizeof(buffer));
-strcpy(buffer,"Hello -ack");
-n=send(cli_sock,buffer,sizeof(buffer),0);
-if(n<0)error("Error while Communication");
-printf("Server sent to client %s : %s\n",ip,buffer);
+//Perform Checking
+
+//Send Response
+
+
+//If availible
+//Add to database
+//send as Booked
+
+
+//If not availible
+//Continue
+
+
 //Print time sent
 printf("Sent time= %s\n\n",Time());
 close(cli_sock);
