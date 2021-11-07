@@ -9,6 +9,39 @@
 #include <string.h>
 #include <time.h>
 
+//TO use fgets after scanf
+void scan(int *p){
+scanf("%d",p);
+while ((getchar()) != '\n');
+return;
+}
+
+
+typedef struct exchange
+{
+
+int type;/*0 - booking 
+				   1 - cancelling 
+				   2 - Rescheduling */
+
+
+int hall;//Old Seminar hall-0(take H1)
+	//New Seminar hall 1(take h2)
+int month_type;//current month-0
+		//next month-1
+int event_day;//month.date1[event_day-1]
+
+int slot_no;//month.date1[event_day-1].slots[slot_no]
+
+}exchange;
+
+typedef struct slot
+{ int booking_status;
+  char name[50];
+  char contact[10];
+  long int booking_id;
+}slot;
+
 
 typedef struct Message{
 char name[15];
@@ -64,27 +97,106 @@ serv_addr.sin_addr.s_addr=inet_addr(argv[1]);
 
   if (connect (cli_sock, (struct sockaddr *) &serv_addr, sizeof (serv_addr)) <0)error("Connection Failed");
 printf("Connected to server successfully\n\n");
-msg Send;
+/*msg Send;
 strcpy(Send.name,"Bharath");
 strcpy(Send.contact,"123456789");
 bzero(recvbuffer,255);
 strcpy(recvbuffer,"Hello");
 n=send(cli_sock,(void *)&Send,sizeof(Send),0);
 if(n<0)error("Error while Communication");
-printf("Client  sent to server %s : %s\t %s\n",argv[1],Send.name,Send.contact);
+printf("Client  sent to server %s : %s\t %s\n",argv[1],Send.name,Send.contact);*/
 //Print time sent
-printf("Sent time= %s\n\n",Time());
+//printf("Sent time= %s\n\n",Time());
 
 
+exchange req;
+slot con;
+  printf
+    ("\t\tWELCOME TO SEMINAR HALL BOOKING APP\n\tChoose the following\n1.Booking\n2.Cancelling\n3.Rescheduling\n4.Exit\n\n\nchoice? :");
+  scan (&req.type);
+  if (req.type==4)exit(0);
+  //while ((getchar()) != '\n');
+  switch (req.type -= 1)
+  {
+case 0:
+    {
+      printf
+	("\tYou Have chosen For Booking the Hall\nWhich Seminar Hall do You want to Book\n1.Old Seminar Hall\n2.New Seminar Hall\n\nChoice? : ");
+      scan (&req.hall);
+//    while ((getchar()) != '\n');
+      req.hall -= 1;
+      req.
+	hall ? printf ("You have chosen New seminar Hall\n") :
+	printf ("You Have chosen Old seminar hall\n");
+     /* printf ("Booking type \n1.Single Day\n2.More than one day\n");
+      scan ( &req.B_day);
+  //    while ((getchar()) != '\n');
+      switch (req.B_day -= 1)
+	{
+	case 0:
+	  printf ("One Day Booking\n");break;
+	case 1:
+	  printf ("Booking Service not available");
+	  exit (1);
+	default:
+	  printf ("Invalid Choice");
+	  exit (1);
+	}*/
+	printf("\n\n1.Current Month\n2.Next Month\nChoice? :");
+	scan(&req.month_type);
+	req.month_type-=1;
+	req.month_type?printf("\n\nYou have chosen Next Month\n"):printf("\n\nYou have chosen Current Month\n");
+	printf("\nEnter the date you want to book? : ");
+	scan(&req.event_day);
+	req.event_day-=1;
+	printf("\nEnter Slot Number(1-7) : ");
+	scan(&req.slot_no);
+	req.slot_no-=1;
+	//printf("%d\n%d\n%d\n%d\n%d",req.type,req.hall,req.month_type,req.event_day,req.slot_no);
+	//Send to server for checking
+	n=send(cli_sock,(void *)&req,sizeof(req),0);
+      if(n<0)error("Error sending Details\nTry again");
 
+	//receieve response as slot with booking id and booking status
+	n=recv(cli_sock,(slot *)&con,sizeof(con),0);
+	if(n<0)error("Error Receieving Status\nTry again");
+	//if booking status ==0 take details
+	if(con.booking_status==0)
+	{
+		printf ("/n/nThe slot is Free\n\nPlease Provide your Contact Details\nYour Name : ");
+		fgets (con.name, sizeof (con.name), stdin);
+		printf ("Contact Number : ");
+		fgets (con.contact, sizeof (con.contact), stdin);
+		n=send(cli_sock,(void *)&con,sizeof(con),0);
+      		if(n<0)error("Error sending Details\nTry again");
+	}
+	else
+	{
+		printf("\n\nThe Slot Has already been Booked by %s Contact Number %s",con.name,con.contact);
+		
+	}
+	break;
+}
+
+case 1:
+    printf ("Service Not Available");
+    exit (1);
+default:
+    printf ("Service Not Available");
+    exit (1);
+
+
+}
+/*
 bzero(recvbuffer,sizeof(recvbuffer));
 n=recv(cli_sock,recvbuffer,255,0);
 if(n<0)error("Error while Communication");
 printf("Client Received from server %s : %s\n",argv[1],recvbuffer);
 //print time recieved
 printf("Received Time =%s\n\n",Time());
-
+*/
 close(cli_sock);
+printf("\n\nClient Socket Closed\n\n");
 return 0;
 
 }

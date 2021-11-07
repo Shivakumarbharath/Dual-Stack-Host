@@ -7,9 +7,25 @@
 #include <unistd.h>
 #include <arpa/inet.h>//to use inet ntoa(struct in_addr)to convert struct to ip address
 #include <time.h>
-struct exc
+#include <signal.h>
+
+
+//TO use CTRL+c to stop the while loop
+static volatile int keepRunning = 1;
+void intHandler(int dummy) {
+    keepRunning = 0;
+}
+
+
+typedef struct exchange
 {
-int type;//Old Seminar hall-0(take H1)
+int type;/*0 - booking 
+				   1 - cancelling 
+				   2 - Rescheduling */
+
+
+
+int hall;//Old Seminar hall-0(take H1)
 	//New Seminar hall 1(take h2)
 int month_type;//current month-0
 		//next month-1
@@ -17,17 +33,21 @@ int event_day;//month.date1[event_day-1]
 
 int slot_no;//month.date1[event_day-1].slots[slot_no]
 
-};
+}exchange;
+
+
 typedef struct slot
 { int booking_status;
-  char who[50];
+  char name[50];
   char contact[10];
   long int booking_id;
 }slot;
+
 typedef struct date
 { struct slot slots[7];
   int   work_day;
 }date;
+
 typedef struct month
 { struct date date1[31];  // need to take care 30 days and Feb
 int mon;
@@ -44,6 +64,7 @@ void Initialise(month *cur_month)
 		for(int j=0;j<7;j++)
 		{
 			cur_month->date1[i].slots[j].booking_status=0;
+			//printf("%d %d\t%d\n",i,j,cur_month->date1[i].slots[j].booking_status);
 		}
 
 	}
@@ -83,7 +104,17 @@ exit(1);
 int main(){
 //declare variable for server socket,accepted client connection and portnumber
 disp();
+printf("Initialise the Structure?1.Yes\n2.no");
+int init;
+scanf("%d",&init);
+if(init==1)
+{
+Initialise(&h1_cur_month);
+Initialise(&h1_nxt_month);
+Initialise(&h2_cur_month);
+Initialise(&h2_nxt_month);
 
+}
 int ser_sock,cli_sock,portno;
 portno=5000;
 //declare varble to send and receieve message
@@ -114,6 +145,12 @@ printf("Binding Successfull\n\n");
 
 listen(ser_sock,5);
 printf("Listening!!!\n\n");
+
+
+signal(SIGINT, intHandler);//using Ctrl+c
+while(keepRunning)
+{
+
 //accept from client
 client_len=sizeof(client_addr);
 cli_sock=accept(ser_sock,(struct sockaddr *)&client_addr,&client_len);
@@ -126,26 +163,131 @@ printf("ipv4 Address : %s\t",ip);
 printf("Port number %d\n\n\n\n",client_addr.sin_port);
 //Read from client
 int n;
-msg Recv;
+/*msg Recv;
 bzero(buffer,sizeof(buffer));
 n=recv(cli_sock,(msg *)&Recv,sizeof(Recv),0);
 if(n<0)error("Error while Communication");
 printf("Server Received from client %s : %s\t contact %s",ip,Recv.name,Recv.contact);
 //print time recieved
 printf("Recieced Time =%s\n\n",Time());
+*/
 
-sleep(2);
-//Send back ack
-bzero(buffer,sizeof(buffer));
-strcpy(buffer,"Hello -ack");
-n=send(cli_sock,buffer,sizeof(buffer),0);
-if(n<0)error("Error while Communication");
-printf("Server sent to client %s : %s\n",ip,buffer);
-//Print time sent
-printf("Sent time= %s\n\n",Time());
+exchange resp;
+slot con;
+
+
+n=recv(cli_sock,(exchange *)&resp,sizeof(resp),0);
+if(n<0)error("Error Receieving Status\nTry again");
+//if the selection is booking perform checking and if free increament for booking id
+if(resp.hall==0 && resp.month_type==0)
+	{
+	if(h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
+		{
+		//make booking id and send the slot
+		
+		//h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
+		//printf("Going into the if statment");
+		n=send(cli_sock,(void *)&h1_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
+	        if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+		
+
+	        slot recieve;
+                 n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
+                 h1_cur_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
+                 //change the status
+                 h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
+
+
+		}
+	else
+		{
+		//send that slot
+		 n=send(cli_sock,(void *)&h1_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
+                 if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+                 //printf("Problem");
+		}
+	}
+else if(resp.hall==0 && resp.month_type==1)
+	{
+         if(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
+                 { 
+                 //make booking id and send the slot
+                
+                 //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
+                 n=send(cli_sock,(void *)&h1_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
+                 if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+                 slot recieve;
+                 //Change the status
+                
+                 n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
+                 h1_nxt_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
+		h1_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
+               }
+            else
+                 {
+                 //send that slot
+                  n=send(cli_sock,(void *)&h1_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
+                  if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+                 }
+
+	}
+else if(resp.hall==1 && resp.month_type==0)
+	
+        {
+          if(h2_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
+                  { 
+                  //make booking id and send the slot
+            
+                  //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
+                  n=send(cli_sock,(void *)&h2_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
+                  if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+		slot recieve;
+
+		
+		n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
+		h2_cur_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
+		//change the status
+		h2_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
+                }
+             else
+                  {
+                  //send that slot
+                   n=send(cli_sock,(void *)&h2_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
+                   if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+                  }
+
+	}
+else if(resp.hall==1 && resp.month_type==1)
+	
+        {
+          if(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
+                  { 
+                  //make booking id and send the slot
+                  h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
+                  //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
+                  n=send(cli_sock,(void *)&h2_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
+                  if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+                  slot recieve;
+                 n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
+                 h2_nxt_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
+                 //change the status
+		h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
+                }
+             else
+                  {
+                  //send that slot
+                   n=send(cli_sock,(void *)&h2_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
+                                      if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+                  }
+
+	}
+
 close(cli_sock);
-close(ser_sock);
+printf("\n\nClient Socket closed\n\n");
 
+}
+close(ser_sock);
+printf("\n\nServer socket closed\n\n");
 return 0;
 
 }
