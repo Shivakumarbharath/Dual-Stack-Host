@@ -14,6 +14,7 @@
 static volatile int keepRunning = 1;
 void intHandler(int dummy) {
     keepRunning = 0;
+    
 }
 
 
@@ -179,115 +180,242 @@ slot con;
 n=recv(cli_sock,(exchange *)&resp,sizeof(resp),0);
 if(n<0)error("Error Receieving Status\nTry again");
 //if the selection is booking perform checking and if free increament for booking id
-if(resp.hall==0 && resp.month_type==0)
+switch(resp.type)
+{	
+	case 0:
 	{
-	if(h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
+	if(resp.hall==0 && resp.month_type==0)
 		{
-		//make booking id and send the slot
-		
-		//h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
-		//printf("Going into the if statment");
-		n=send(cli_sock,(void *)&h1_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
-	        if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+		if(h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
+			{
+			//make booking id and send the slot
+			printf("%d",h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status);
+			//h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
+			//printf("Going into the if statment");
+			n=send(cli_sock,(void *)&h1_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
+	        	if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
 		
 
-	        slot recieve;
-                 n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
-                 h1_cur_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
-                 //change the status
-                 h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
+		        slot recieve;
+                	 n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
+                	 h1_cur_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
+                 	//change the status
+                 	h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
+			printf("%d",h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status);
+
+			}
+		else
+			{
+			//send that slot
+			 n=send(cli_sock,(void *)&h1_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
+                	 if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+                	 //printf("Problem");
+			}
+		}
+	else if(resp.hall==0 && resp.month_type==1)
+		{
+        	 if(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
+        	         { 
+        	         //make booking id and send the slot
+        	        
+                	 //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
+                 	n=send(cli_sock,(void *)&h1_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
+                 	if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+                 	slot recieve;
+                 	//Change the status
+                	
+                 	n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
+                 	h1_nxt_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
+			h1_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
+               		}
+            	else
+                 	{
+                 	//send that slot
+                 	 n=send(cli_sock,(void *)&h1_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
+                 	 if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+                 	}
+
+		}
+	else if(resp.hall==1 && resp.month_type==0)
+		
+	        {
+	          if(h2_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
+	                  { 
+	                  //make booking id and send the slot
+	            
+	                  //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
+	                  n=send(cli_sock,(void *)&h2_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
+	                  if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+			slot recieve;
+	
+		
+			n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
+			h2_cur_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
+			//change the status
+			h2_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
+        	        }
+        	     else
+        	          {
+        	          //send that slot
+        	           n=send(cli_sock,(void *)&h2_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
+        	           if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+        	          }
+	
+		}
+	else if(resp.hall==1 && resp.month_type==1)
+		
+        	{
+          	if(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
+          	        { 
+          	        //make booking id and send the slot
+          	        
+          	        //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
+          	        n=send(cli_sock,(void *)&h2_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
+          	        if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+          	        slot recieve;
+          	       n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
+          	       h2_nxt_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
+          	       //change the status
+			h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
+        	        }
+        	     else
+                  	{
+                  	//send that slot
+                   	n=send(cli_sock,(void *)&h2_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
+                        	              if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
+                        }
+                  }
+	
+break;	}
+	
+	
+case 1:
+	{
+	
+		if(resp.hall==0 && resp.month_type==0)
+		{
+		if(h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status==1)
+			{
+			//make booking id=0
+			
+			//h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=0;
+			
+                 	//change the status
+                 	h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status=0;
+                 	//remove the name 
+                 	strcpy(h1_cur_month.date1[resp.event_day].slots[resp.slot_no].name,"");
+                 	strcpy(h1_cur_month.date1[resp.event_day].slots[resp.slot_no].contact,"");
+			char cancel_report[]={"\n\nBooking Cancelled\n"};
+			n=send(cli_sock,&cancel_report,sizeof(cancel_report),0);
+			if(n<0){printf("Error sending Cancellation Report\nTry again");close(cli_sock);}
+
+                 	//Send a string as Booking canceled
+                 	
+
+			}
+		else
+			{
+			//send as This slot Not yet Booked check Your slot again
+			char cancel_report[]={"\n\nThis Slot has not been Booked Please Check the Slot Again\n"};
+                         n=send(cli_sock,&cancel_report,sizeof(cancel_report),0);
+                         if(n<0){printf("Error sending Cancellation Report\nTry again");close(cli_sock);}
+
+			}
+		}
+	else if(resp.hall==0 && resp.month_type==1)
+		{
+        	 if(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status==1)
+        	         { 
+        	         //make booking id and send the slot
+        	        
+                	 //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
+                 	
+			h1_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status=0;
+			strcpy(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no].name,"");
+			strcpy(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no].contact,"");
+			char cancel_report[]={"\n\nBooking Cancelled\n"};
+                         n=send(cli_sock,&cancel_report,sizeof(cancel_report),0);
+                         if(n<0){printf("Error sending Cancellation Report\nTry again");close(cli_sock);}
+
+               		}
+            	else
+                 	{
+                         //send as This slot Not yet Booked check Your slot again
+                         char cancel_report[]={"\n\nThis Slot has not been Booked Please Check the Slot Again\n"};
+                          n=send(cli_sock,&cancel_report,sizeof(cancel_report),0);
+                          if(n<0){printf("Error sending Cancellation Report\nTry again");close(cli_sock);}
+
+                        }
 
 
 		}
-	else
-		{
-		//send that slot
-		 n=send(cli_sock,(void *)&h1_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
-                 if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
-                 //printf("Problem");
-		}
-	}
-else if(resp.hall==0 && resp.month_type==1)
-	{
-         if(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
-                 { 
-                 //make booking id and send the slot
-                
-                 //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
-                 n=send(cli_sock,(void *)&h1_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
-                 if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
-                 slot recieve;
-                 //Change the status
-                
-                 n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
-                 h1_nxt_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
-		h1_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
-               }
-            else
-                 {
-                 //send that slot
-                  n=send(cli_sock,(void *)&h1_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
-                  if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
-                 }
-
-	}
-else if(resp.hall==1 && resp.month_type==0)
-	
-        {
-          if(h2_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
-                  { 
-                  //make booking id and send the slot
-            
-                  //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
-                  n=send(cli_sock,(void *)&h2_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
-                  if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
-		slot recieve;
-
+	else if(resp.hall==1 && resp.month_type==0)
 		
-		n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
-		h2_cur_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
-		//change the status
-		h2_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
-                }
-             else
-                  {
-                  //send that slot
-                   n=send(cli_sock,(void *)&h2_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
-                   if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
-                  }
+	        {
+	          if(h2_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status==1)
+	                  { 
+	                  //make booking id and send the slot
+	            
+	                  //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
+	                 //change the status
+                         h2_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status=0;
+                         //remove the name 
 
-	}
-else if(resp.hall==1 && resp.month_type==1)
+                         strcpy(h2_cur_month.date1[resp.event_day].slots[resp.slot_no].name,"");
+                         strcpy(h2_cur_month.date1[resp.event_day].slots[resp.slot_no].contact,"");
+                         char cancel_report[]={"\n\nBooking Cancelled\n"};
+                         n=send(cli_sock,&cancel_report,sizeof(cancel_report),0);
+                         if(n<0){printf("Error sending Cancellation Report\nTry again");close(cli_sock);}
+ 
+        	        }
+        	     else
+        	          {
+                         //send as This slot Not yet Booked check Your slot again
+                         char cancel_report[]={"\n\nThis Slot has not been Booked Please Check the Slot Again\n"};
+                          n=send(cli_sock,&cancel_report,sizeof(cancel_report),0);
+                          if(n<0){printf("Error sending Cancellation Report\nTry again");close(cli_sock);}
+                         }
+
 	
-        {
-          if(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status==0)
-                  { 
-                  //make booking id and send the slot
-                  h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
-                  //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
-                  n=send(cli_sock,(void *)&h2_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
-                  if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
-                  slot recieve;
-                 n=recv(cli_sock,(slot *)&recieve,sizeof(recieve),0);
-                 h2_nxt_month.date1[resp.event_day].slots[resp.slot_no]=recieve;
-                 //change the status
-		h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status=1;
-                }
-             else
-                  {
-                  //send that slot
-                   n=send(cli_sock,(void *)&h2_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
-                                      if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
-                  }
+		}
+	else if(resp.hall==1 && resp.month_type==1)
+		
+        	{
+          	if(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status==1)
+          	        { 
+          	        //make booking id =0
+          	        //h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id=
+          	        //change the status
+                         h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_status=0;
+                         //remove the name 
+                         strcpy(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].name,"");
+                         strcpy(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].contact,"");
+                         char cancel_report[]={"\n\nBooking Cancelled\n"};
+                         n=send(cli_sock,&cancel_report,sizeof(cancel_report),0);
+                         if(n<0){printf("Error sending Cancellation Report\nTry again");close(cli_sock);}
+
+        	        }
+        	     else
+                  	  {
+                          //send as This slot Not yet Booked check Your slot again
+                          char cancel_report[]={"\n\nThis Slot has not been Booked Please Check the Slot Again\n"};
+                           n=send(cli_sock,&cancel_report,sizeof(cancel_report),0);
+                           if(n<0){printf("Error sending Cancellation Report\nTry again");close(cli_sock);}
+                          }
+
+		break;}
 
 	}
+}
 
 close(cli_sock);
 printf("\n\nClient Socket closed\n\n");
+
 
 }
 close(ser_sock);
 printf("\n\nServer socket closed\n\n");
 return 0;
+
 
 }

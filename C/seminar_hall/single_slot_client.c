@@ -179,8 +179,30 @@ case 0:
 }
 
 case 1:
-    printf ("Service Not Available");
-    exit (1);
+	{
+   	printf
+         ("\tYou Have chosen For Cancellation of Booking the Hall\nWhich Seminar Hall did You Book\n1.Old Seminar Hall\n2.New Seminar Hall\n\nChoice? : ");
+         scan (&req.hall);
+         req.hall -= 1;
+         req.hall ? printf ("You had chosed New seminar Hall\n"):printf ("You Had chosed Old seminar hall\n");
+  	printf("\n\n1.Current Month\n2.Next Month\nChoice? :");
+         scan(&req.month_type);
+         req.month_type-=1;
+         req.month_type?printf("\n\nYou had chosed Next Month\n"):printf("\n\nYou had chosed Current Month\n");
+         printf("\nEnter the date you booked? : ");
+         scan(&req.event_day);
+         req.event_day-=1;
+         printf("\nEnter Slot Number(1-7) : ");
+         scan(&req.slot_no);
+         req.slot_no-=1;
+        //Send when to cancel
+         n=send(cli_sock,(void *)&req,sizeof(req),0);
+         if(n<0)error("Error sending Details\nTry again");
+	char report[255];
+	n=recv(cli_sock,&report,sizeof(report),0);
+	puts(report);
+
+	}
 default:
     printf ("Service Not Available");
     exit (1);
