@@ -39,7 +39,7 @@ typedef struct slot
 { int booking_status;
   char name[50];
   char contact[11];
-  unsigned long long int booking_id;
+  char booking_id[17];
 }slot;
 
 
@@ -58,11 +58,12 @@ printf("\n\tBooking Details\n\n");
 printf("Name : %s\n",info.name);
 printf("Contact Number : %s\n\n",info.contact);
 int day,month,year,hall,slot;
-day=info.booking_id/100000000;
+/*day=info.booking_id/100000000;
 month=(info.booking_id/1000000)%100;
 year=(info.booking_id/100)%10000;
 hall=(info.booking_id%100)/10;
-slot=info.booking_id%10;
+slot=info.booking_id%10;*/
+sscanf(info.booking_id,"%02d-%02d-%04d-%d-%d",&day,&month,&year,&hall,&slot);
 printf("Date - %02d/%02d/%d\n\n",day,month,year);
 if(hall==1)printf("Seminar Hall : Old Seminar Hall\n\n");
 if(hall==2)printf("Seminar Hall : New Seminar Hall\n\n");
@@ -77,7 +78,7 @@ case 6:strcpy(time,"2PM - 3PM");break;
 case 7:strcpy(time,"3PM - 4PM");break;
 }
 printf("Slot Time %s\n\n",time);
-printf("Booking Id : %llu\n\n",info.booking_id);
+printf("Booking Id : %s\n\n",info.booking_id);
 return;
 }
 
@@ -195,15 +196,16 @@ case 0:
 		fgets (con.contact, sizeof (con.contact), stdin);
 		n=send(cli_sock,(void *)&con,sizeof(con),0);
       		if(n<0)error("Error sending Details\nTry again");
-      		Printf("Booking Successfull");
       		Display_slot(con);
+      		Printf("Booking Successfull");
+
 	}
 	else
 	{
-		Printf("Booking Failed");
+		
 		printf("\n\nThe Slot Has already been Booked\nDetails Given\n");
 		Display_slot(con);
-		
+		Printf("Booking Failed");
 	}
 	break;
 }
@@ -230,8 +232,9 @@ case 1:
          if(n<0)error("Error sending Details\nTry again");
 	char report[255];
 	n=recv(cli_sock,&report,sizeof(report),0);
-	puts(report);
-	Printf("Booking Cancelled Successfully");
+	
+	Printf(report);
+	break;
 	}
 default:
     printf ("Service Not Available");
