@@ -17,22 +17,6 @@ void intHandler(int dummy) {
     
 }
 
- int int_to_binary(int arr[]){
- int bin,i;
- int multiplier=1;
- for(i=6;i>=0;--i){
- printf("%d",arr[6-i]);
- bin+=(multiplier*arr[i]);
- multiplier*=10;
- }
-printf("\n\n");
- return bin;
-
- }
-
-
-
-
 void Printf(const char *msg ){printf("\n\n\n-------------------------------------------%s---------------------------------------\n\n\n\n",msg);}
 
 typedef struct exchange
@@ -66,6 +50,7 @@ typedef struct slot
 typedef struct date
 { struct slot slots[7];
   int   work_day;
+  unsigned char day_status;
 }date;
 
 typedef struct month
@@ -79,7 +64,7 @@ month h1_cur_month,h1_nxt_month,h2_cur_month,h2_nxt_month;
 
 typedef struct date_status{
 
-int status[31];
+unsigned char status[31];
 }date_status;
 
 date_status check_status(month mon)
@@ -88,31 +73,34 @@ date_status check_status(month mon)
 	date_status status;
 	int *p;
 	for(int i=0;i<31;i++)
-	{	int day[7]={0,0,0,0,0,0,0};
-		for(int j=0;j<7;j++)
-		{
-		day[j]=mon.date1[i].slots[j].booking_status;
-		}
-		p=day
-		status.status[i]=int_to_binary(p);
-		for(int y=0;y<7;y++)printf("%d",day[y]);
-		printf("\n%d\n",status.status[i]);
+	{	
+		status.status[i]=mon.date1[i].day_status;
 	}
 
 	for(int i=0;i<31;i++)
-	{	printf("\n\n Date - %d \t slots %07d ",i+1,status.status[i]);
-		/*for(int j=0;j<7;j++)
-		{
-			printf("%d",status.status[i][j]);
-		}*/
-
-	}
+	{printf("\n\n Date - %d \t slots %07d ",i+1,status.status[i]);}
 	return status;
 }
 
 
 
+unsigned char Slot_to_Binary(int no){
 
+unsigned char result;
+switch(no)
+
+	{
+	case 1:result=64;break;
+	case 2:result=32;break;
+	case 3:result=16;break;
+	case 4:result=8;break;
+	case 5:result=4;break;
+	case 6:result=2;break;
+	case 7:result=1;break;
+	default:result=0;break;
+	}
+	return result;
+}
 
 
 void Initialise(month *cur_month)
@@ -120,6 +108,7 @@ void Initialise(month *cur_month)
 	for(int i=0;i<31;i++)
 	{
 		cur_month->date1[i].work_day=i;
+		cur_month->date1[i].day_status=0;
 		for(int j=0;j<7;j++)
 		{
 			cur_month->date1[i].slots[j].booking_status=0;
@@ -315,6 +304,7 @@ switch(resp.type)
 			//make booking id and send the slot
 			printf("%d",h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_status);
 			strcpy(h1_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id,booking_id(resp,h1_cur_month.mon,h1_cur_month.year));
+			h1_cur_month.date1[resp.event_day].day_status|=Slot_to_Binary(resp.slot_no+1);
 			//printf("Going into the if statment");
 			n=send(cli_sock,(void *)&h1_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
 	        	if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
@@ -347,6 +337,7 @@ switch(resp.type)
         	         //make booking id and send the slot
         	        
                 	 strcpy(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_id,booking_id(resp,h1_nxt_month.mon,h1_nxt_month.year));
+			h1_nxt_month.date1[resp.event_day].day_status|=Slot_to_Binary(resp.slot_no+1);
                  	n=send(cli_sock,(void *)&h1_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h1_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
                  	if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
                  	slot recieve;
@@ -379,6 +370,7 @@ switch(resp.type)
 	                  //make booking id and send the slot
 	            
 	                  strcpy(h2_cur_month.date1[resp.event_day].slots[resp.slot_no].booking_id,booking_id(resp,h2_cur_month.mon,h2_cur_month.year));
+			  h2_cur_month.date1[resp.event_day].day_status|=Slot_to_Binary(resp.slot_no+1);
 	                  n=send(cli_sock,(void *)&h2_cur_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_cur_month.date1[resp.event_day].slots[resp.slot_no]),0);
 	                  if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
 			slot recieve;
@@ -412,6 +404,7 @@ switch(resp.type)
           	        //make booking id and send the slot
           	        
           	        strcpy(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no].booking_id,booking_id(resp,h2_nxt_month.mon,h2_nxt_month.year));
+			h2_nxt_month.date1[resp.event_day].day_status|=Slot_to_Binary(resp.slot_no+1);
           	        n=send(cli_sock,(void *)&h2_nxt_month.date1[resp.event_day].slots[resp.slot_no],sizeof(h2_nxt_month.date1[resp.event_day].slots[resp.slot_no]),0);
           	        if(n<0){printf("Error sending Details\nTry again");close(cli_sock);}
           	        slot recieve;
