@@ -297,13 +297,6 @@ void
 Book (int cli_sock, exchange resp, month * h1)
 {
   int n;
-  date_status stat = check_status (h1);
-//n=send(cli_sock,(void *)&stat,sizeof(stat),0);
-  if (n < 0)
-    {
-      printf ("Error sending Details\nTry again");
-      close (cli_sock);
-    }
   if (h1->date1[resp.event_day].slots[resp.slot_no].booking_status == 0)
     {
       //make booking id and send the slot
@@ -326,6 +319,11 @@ Book (int cli_sock, exchange resp, month * h1)
 
       slot recieve;
       n = recv (cli_sock, (slot *) & recieve, sizeof (recieve), 0);
+	if (n < 0)
+        {
+          printf ("Error Recieving Details\nTry again");
+          close (cli_sock);
+        }
       h1->date1[resp.event_day].slots[resp.slot_no] = recieve;
       //change the status
       h1->date1[resp.event_day].slots[resp.slot_no].booking_status = 1;
@@ -333,7 +331,7 @@ Book (int cli_sock, exchange resp, month * h1)
 	      h1->date1[resp.event_day].slots[resp.slot_no].booking_status);
       Display_slot (recieve);
       Printf ("Booking Successfull!!");
-      stat = check_status (h1);
+      date_status stat = check_status (h1);
       display_status (stat);
 
     }
@@ -676,6 +674,11 @@ printf("Recieced Time =%s\n\n",Time());
 	    break;
 
 	  }
+	case 4:
+	{
+	Printf("Exit Client");
+	break;
+	}
 	default:
 	  Printf ("Service not availible");
 	}			//switch

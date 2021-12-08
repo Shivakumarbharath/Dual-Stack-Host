@@ -104,16 +104,16 @@ Display_slot (slot info)
 {
 
   printf ("\n\tBooking Details\n\n");
-  printf ("Name : %s\n", info.name);
-  printf ("Contact Number : %s\n\n", info.contact);
+  printf ("\tName : %s\n", info.name);
+  printf ("\tContact Number : %s\n\n", info.contact);
   int day, month, year, hall, slot;
   sscanf (info.booking_id, "%02d-%02d-%04d-%d-%d", &day, &month, &year, &hall,
 	  &slot);
-  printf ("Date - %02d/%02d/%d\n\n", day, month, year);
+  printf ("\tDate - %02d/%02d/%d\n\n", day, month, year);
   if (hall == 1)
-    printf ("Seminar Hall : Old Seminar Hall\n\n");
+    printf ("\tSeminar Hall : Old Seminar Hall\n\n");
   if (hall == 2)
-    printf ("Seminar Hall : New Seminar Hall\n\n");
+    printf ("\tSeminar Hall : New Seminar Hall\n\n");
   char time[12];
   switch (slot)
     {
@@ -139,8 +139,8 @@ Display_slot (slot info)
       strcpy (time, "3PM - 4PM");
       break;
     }
-  printf ("Slot Time %s\n\n", time);
-  printf ("Booking Id : %s\n\n", info.booking_id);
+  printf ("\tSlot Time :  %s\n\n", time);
+  printf ("\tBooking Id : %s\n\n", info.booking_id);
   return;
 }
 
@@ -211,8 +211,8 @@ printf("Client  sent to server %s : %s\t %s\n",argv[1],Send.name,Send.contact);*
   printf
     ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nChoice : ");
   scan (&req.type);
-  if (req.type == 5)
-    exit (0);
+//  if (req.type == 5)
+  //  {exit (0);close(cli_sock);}
   //while ((getchar()) != '\n');
   switch (req.type -= 1)
     {
@@ -245,7 +245,7 @@ printf("Client  sent to server %s : %s\t %s\n",argv[1],Send.name,Send.contact);*
 	req.
 	  month_type ? printf ("\n\n\tYou have chosen Next Month\n") :
 	  printf ("\n\n\tYou have chosen Current Month\n");
-	printf ("\n\n\n\tEnter the date you want to book? : ");
+	printf ("\n\n\n\tEnter the date you want to book (0-31) : ");
 	scan (&req.event_day);
 	req.event_day -= 1;
 	printf ("\n\n\n\tEnter Slot Number(1-7) : ");
@@ -256,11 +256,6 @@ printf("Client  sent to server %s : %s\t %s\n",argv[1],Send.name,Send.contact);*
 	n = send (cli_sock, (void *) &req, sizeof (req), 0);
 	if (n < 0)
 	  error ("Error sending Details\nTry again");
-	date_status stat;
-	//     n=recv(cli_sock,(date_status *)&stat,sizeof(stat),0);
-//      display_status(stat);
-	if (n < 0)
-	  error ("Error Receieving Status\nTry again");
 	//receieve response as slot with booking id and booking status
 	n = recv (cli_sock, (slot *) & con, sizeof (con), 0);
 	if (n < 0)
@@ -268,6 +263,7 @@ printf("Client  sent to server %s : %s\t %s\n",argv[1],Send.name,Send.contact);*
 	//if booking status ==0 take details
 	if (con.booking_status == 0)
 	  {
+	printf("Booking id - %s \n\n",con.booking_id);
 	    printf
 	      ("\n\n\n\tThe slot is Free\n\n\n\tPlease Provide your Contact Details\n\n\n\tYour Name : ");
 	    fgets (con.name, sizeof (con.name), stdin);
@@ -305,7 +301,7 @@ printf("Client  sent to server %s : %s\t %s\n",argv[1],Send.name,Send.contact);*
 	req.
 	  month_type ? printf ("\n\nYou had chosed Next Month\n") :
 	  printf ("\n\nYou had chosed Current Month\n");
-	printf ("\n\n\n\tEnter the date you booked? : ");
+	printf ("\n\n\n\tEnter the date you booked (1-31) : ");
 	scan (&req.event_day);
 	req.event_day -= 1;
 	printf ("\n\n\n\tEnter Slot Number(1-7) : ");
@@ -351,7 +347,7 @@ printf("Client  sent to server %s : %s\t %s\n",argv[1],Send.name,Send.contact);*
 	req.month_type -= 1;
 	req.
 	  month_type ? printf ("\n\nYou have chosen Next Month\n") :
-	  printf ("\n\nYou have chosen Current Month\n");
+	  printf ("\n\nYou have chosen Current Month\n\n\n");
 	n = send (cli_sock, (void *) &req, sizeof (req), 0);
 	if (n < 0)
 	  error ("Error sending Details\nTry again");
@@ -362,22 +358,23 @@ printf("Client  sent to server %s : %s\t %s\n",argv[1],Send.name,Send.contact);*
 	display_status (stat);
 	break;
       }
+case 4:
+	{
+	printf("\n\n\nThank You for Using the Application\n\n\tVisit Again\n\n");
+	n = send (cli_sock, (void *) &req, sizeof (req), 0);
+        if (n < 0)
+          error ("Error sending Details\nTry again");
+	break;
+	}
     default:
-      printf ("Service Not Available");
+      Printf ("Service Not Available");
       exit (1);
 
 
     }
-/*
-bzero(recvbuffer,sizeof(recvbuffer));
-n=recv(cli_sock,recvbuffer,255,0);
-if(n<0)error("Error while Communication");
-printf("Client Received from server %s : %s\n",argv[1],recvbuffer);
-//print time recieved
-printf("Received Time =%s\n\n",Time());
-*/
+
   close (cli_sock);
-  printf ("\n\nClient Socket Closed\n\n");
+  Printf ("\n\nClient Socket Closed\n\n");
   return 0;
 
 }
