@@ -75,6 +75,7 @@ typedef struct slot
   char name[50];
   char contact[11];
   char booking_id[17];
+  char purpose[20];
 } slot;
 
 typedef struct date
@@ -283,6 +284,7 @@ slot=info.booking_id%10;
     }
   printf (YEL"Slot Time : "BLU"%s\n\n"RESET, time);
   printf (YEL"Booking Id :"BLU" %s\n\n"RESET, info.booking_id);
+  printf(YEL"Purpose :"BLU" %s\n\n"RESET, info.purpose);
   return;
 }
 
@@ -414,6 +416,7 @@ Cancel_date (int cli_sock, exchange resp, char *fname)
       //make booking id=0
 
       strcpy (h1.date1[resp.event_day].slots[resp.slot_no].booking_id, "");
+      strcpy (h1.date1[resp.event_day].slots[resp.slot_no].purpose, "");
 
       //change the status
       h1.date1[resp.event_day].slots[resp.slot_no].booking_status = 0;
@@ -435,7 +438,6 @@ Cancel_date (int cli_sock, exchange resp, char *fname)
       //date_status stat = check_status (fname);
       //display_status (stat);
       //Send a string as Booking canceled
-
 
     }
   else
@@ -482,6 +484,7 @@ FILE *fp;
       Display_slot (h1.date1[day].slots[slot]);
       //make booking id =0
       strcpy (h1.date1[day].slots[slot].booking_id, "");
+      strcpy (h1.date1[day].slots[slot].purpose, "");
       //change the status
       h1.date1[day].slots[slot].booking_status = 0;
       h1.date1[day].day_status &= (~Slot_to_Binary (slot + 1));

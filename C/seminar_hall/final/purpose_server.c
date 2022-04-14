@@ -10,6 +10,16 @@
 #include <signal.h>
 
 
+//Provide colours
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define BLU   "\x1B[34m"
+#define MAG   "\x1B[35m"
+#define CYN   "\x1B[36m"
+#define WHT   "\x1B[37m"
+#define RESET "\x1B[0m"
+
 //TO use CTRL+c to stop the while loop
 static volatile int keepRunning = 1;
 void
@@ -20,12 +30,22 @@ intHandler (int dummy)
 }
 
 void
-Printf (const char *msg)
+Printf_green(const char *msg)
 {
   printf
-    ("\n\n\n-------------------------------------------%s---------------------------------------\n\n\n\n",
+    (GRN"\n\n\n\t\t%s\n\n\n\n"RESET,
      msg);
 }
+
+
+void
+Printf_red(const char *msg)
+{
+  printf
+    (RED"\n\n\n\t\t%s\n\n\n\n"RESET,
+     msg);
+}
+
 
 typedef struct exchange
 {
@@ -55,6 +75,7 @@ typedef struct slot
   char name[50];
   char contact[11];
   char booking_id[17];
+  char purpose[20];
 } slot;
 
 typedef struct date
@@ -219,9 +240,9 @@ void
 Display_slot (slot info)
 {
 
-  printf ("\n\tBooking Details\n\n");
-  printf ("Name : %s\n", info.name);
-  printf ("Contact Number : %s\n\n", info.contact);
+  printf (YEL"\n\tBooking Details\n\n"RESET);
+  printf (YEL"Name : "BLU"%s\n"RESET, info.name);
+  printf (YEL"Contact Number :"BLU" %s\n\n"RESET, info.contact);
   int day, month, year, hall, slot;
 /*day=info.booking_id/100000000;
 month=(info.booking_id/1000000)%100;
@@ -231,11 +252,11 @@ slot=info.booking_id%10;
 */
   sscanf (info.booking_id, "%02d-%02d-%04d-%d-%d", &day, &month, &year, &hall,
 	  &slot);
-  printf ("Date - %02d/%02d/%d\n\n", day, month, year);
+  printf (YEL"Date :"BLU" %02d/%02d/%d\n\n"RESET, day, month, year);
   if (hall == 1)
-    printf ("Seminar Hall : Old Seminar Hall\n\n");
+    printf (YEL"Seminar Hall : "BLU"Old Seminar Hall\n\n"RESET);
   if (hall == 2)
-    printf ("Seminar Hall : New Seminar Hall\n\n");
+    printf (YEL"Seminar Hall : "BLU"New Seminar Hall\n\n"RESET);
   char time[12];
   switch (slot)
     {
@@ -261,8 +282,9 @@ slot=info.booking_id%10;
       strcpy (time, "3PM - 4PM");
       break;
     }
-  printf ("Slot Time %s\n\n", time);
-  printf ("Booking Id : %s\n\n", info.booking_id);
+  printf (YEL"Slot Time : "BLU"%s\n\n"RESET, time);
+  printf (YEL"Booking Id :"BLU" %s\n\n"RESET, info.booking_id);
+  printf(YEL"Purpose :"BLU" %s\n\n"RESET, info.purpose);
   return;
 }
 
@@ -289,12 +311,12 @@ void
 display_status (date_status status)
 {
   printf
-    ("Date\t     slot-1  slot-2  slot-3  slot-4  slot-5  slot-6  slot-7\n");
+    (CYN"Date\t     slot-1  slot-2  slot-3  slot-4  slot-5  slot-6  slot-7\n"RESET);
 
   for (int i = 0; i < 31; i++)
   if(status.status[i]!=0)
     {
-      printf ("\n\n%d-%02d-%04d\t", i + 1, status.month, status.year);
+      printf (YEL"\n\n%d-%02d-%04d\t"RESET, i + 1, status.month, status.year);
       Char_to_Binary (status.status[i]);
     }
 }
@@ -326,7 +348,7 @@ month h1;
 	      sizeof (h1.date1[resp.event_day].slots[resp.slot_no]), 0);
       if (n < 0)
 	{
-	  printf ("Error sending Details\nTry again");
+	  printf (RED"Error sending Details\nTry again"RESET);
 	  close (cli_sock);
 	}
 
@@ -335,7 +357,7 @@ month h1;
       n = recv (cli_sock, (slot *) & recieve, sizeof (recieve), 0);
 	if (n < 0)
         {
-          printf ("Error Recieving Details\nTry again");
+          printf (RED"Error Recieving Details\nTry again"RESET);
           close (cli_sock);
         }
       h1.date1[resp.event_day].slots[resp.slot_no] = recieve;
@@ -344,8 +366,8 @@ month h1;
       printf ("%d",
 	      h1.date1[resp.event_day].slots[resp.slot_no].booking_status);
       Display_slot (recieve);
-      Printf ("Booking Successfull!!");
-      Printf ("Display Status");
+      Printf_green ("Booking Successfull!!");
+      Printf_green ("Display Status");
       
     }
   else
@@ -361,9 +383,9 @@ month h1;
 	  close (cli_sock);
 	}
     
-      printf ("\n\nBooking Already Done\n\nDetails\n");
+      printf (RED"\n\nBooking Already Done\n\nDetails\n"RESET);
       Display_slot (h1.date1[resp.event_day].slots[resp.slot_no]);
-      Printf ("Booking Failed!!");
+      Printf_red ("Booking Failed!!");
     }
 //save it in a file
 fp = fopen (fname, "wb");
@@ -394,6 +416,7 @@ Cancel_date (int cli_sock, exchange resp, char *fname)
       //make booking id=0
 
       strcpy (h1.date1[resp.event_day].slots[resp.slot_no].booking_id, "");
+      strcpy (h1.date1[resp.event_day].slots[resp.slot_no].purpose, "");
 
       //change the status
       h1.date1[resp.event_day].slots[resp.slot_no].booking_status = 0;
@@ -416,11 +439,10 @@ Cancel_date (int cli_sock, exchange resp, char *fname)
       //display_status (stat);
       //Send a string as Booking canceled
 
-
     }
   else
     {
-      Printf ("Cancellation Failed!!");
+      Printf_red ("Cancellation Failed!!");
 
       //send as This slot Not yet Booked check Your slot again
       char cancel_report[] =
@@ -462,10 +484,11 @@ FILE *fp;
       Display_slot (h1.date1[day].slots[slot]);
       //make booking id =0
       strcpy (h1.date1[day].slots[slot].booking_id, "");
+      strcpy (h1.date1[day].slots[slot].purpose, "");
       //change the status
       h1.date1[day].slots[slot].booking_status = 0;
       h1.date1[day].day_status &= (~Slot_to_Binary (slot + 1));
-      Printf ("Booking Cancelled!!");
+      Printf_red ("Booking Cancelled!!");
 
       //remove the name 
       strcpy (h1.date1[day].slots[slot].name, "");
@@ -474,17 +497,17 @@ FILE *fp;
       n = send (cli_sock, &cancel_report, sizeof (cancel_report), 0);
       if (n < 0)
 	{
-	  printf ("Error sending Cancellation Report\nTry again");
+	  printf (RED"Error sending Cancellation Report\nTry again"RESET);
 	  close (cli_sock);
 	}
     }
   else
     {
       //send as This slot Not yet Booked check Your slot again
-      Printf ("Cancellation Failed!!");
+      Printf_red ("Cancellation Failed!!");
 
       char cancel_report[] =
-	{ "\n\nThis Slot has not been Booked Please Check the Slot Again\n" };
+	{ BLU"\n\nThis Slot has not been Booked Please Check the Slot Again\n"RESET };
       n = send (cli_sock, &cancel_report, sizeof (cancel_report), 0);
       if (n < 0)
 	{
@@ -543,7 +566,7 @@ main ()
     {
       error ("Error in Socket creation");
     }
-  Printf ("Socket Created Successfully");
+  Printf_green ("Socket Created Successfully");
 //clear the contents in the declared variable
   bzero ((char *) &serv_addr, sizeof (serv_addr));
 
@@ -555,12 +578,12 @@ main ()
 //Bind the socket to address of the server and check if successfull
   if (bind (ser_sock, (struct sockaddr *) &serv_addr, sizeof (serv_addr)) < 0)
     error ("Error while Binding the socket");
-  Printf ("Binding Successfull");
+  Printf_green ("Binding Successfull");
 
 //Listen by the server
 
   listen (ser_sock, 5);
-  Printf ("Listening!!!");
+  Printf_green ("Listening!!!");
 
 
   signal (SIGINT, intHandler);	//using Ctrl+c
@@ -575,10 +598,10 @@ main ()
 
       if (cli_sock < 0)
 	error ("Error while Accepting the connection");
-      Printf ("Connection Accepted");
+      Printf_green ("Connection Accepted");
       strcpy (ip, inet_ntoa (client_addr.sin_addr));
-      printf ("IPv4 Address : %s\t", ip);
-      printf ("Port number %d\n\n\n\n", client_addr.sin_port);
+      printf (YEL"IPv4 Address :"BLU" %s\t"RESET, ip);
+      printf (YEL"Port number "BLU"%d\n\n\n\n"RESET, client_addr.sin_port);
 //Read from client
       int n;
       int loop;
@@ -676,7 +699,7 @@ main ()
 	  }			// case
 	case 2:
 	  {
-	    Printf ("Display Status");
+	    Printf_green ("Display Status");
 	    date_status s;
 	    if (resp.hall == 0 && resp.month_type == 0)
 	      {
@@ -707,14 +730,14 @@ main ()
 	  }
 	case 3:
 	{
-	Printf("Exit Client");
+	Printf_red("Exit Client");
 	close (cli_sock);
-       Printf ("Client Socket closed");
+       Printf_red ("Client Socket closed");
 	loop=0;
 	break;//while
 	}
 	default:
-	  Printf ("Service not availible");
+	  Printf_red ("Service not availible");
 	}			//switch
 }//inner while
 
@@ -722,7 +745,7 @@ main ()
 
     }				//while
   close (ser_sock);
-  Printf ("Server socket closed");
+  Printf_red ("Server socket closed");
   return 0;
 
 

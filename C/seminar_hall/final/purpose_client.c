@@ -9,6 +9,20 @@
 #include <string.h>
 #include <time.h>
 
+
+//Provide colours
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define BLU   "\x1B[34m"
+#define MAG   "\x1B[35m"
+#define CYN   "\x1B[36m"
+#define WHT   "\x1B[37m"
+#define RESET "\x1B[0m"
+
+
+
+
 //TO use fgets after scanf
 void
 scan (int *p)
@@ -18,13 +32,25 @@ scan (int *p)
   return;
 }
 
+
 void
-Printf (const char *msg)
+Printf_green(const char *msg)
 {
   printf
-    ("\n\n\n-------------------------------------------%s---------------------------------------\n\n\n\n",
+    (GRN"\n\n\n\t\t%s\n\n\n\n"RESET,
      msg);
 }
+
+
+void
+Printf_red(const char *msg)
+{
+  printf
+    (RED"\n\n\n\t\t%s\n\n\n\n"RESET,
+     msg);
+}
+
+
 
 typedef struct exchange
 {
@@ -53,6 +79,7 @@ typedef struct slot
   char name[50];
   char contact[11];
   char booking_id[17];
+  char purpose[20];
 } slot;
 
 
@@ -81,12 +108,12 @@ void
 display_status (date_status status)
 {
   printf
-    ("Date\t     slot-1  slot-2  slot-3  slot-4  slot-5  slot-6  slot-7\n");
+    (CYN"Date\t     slot-1  slot-2  slot-3  slot-4  slot-5  slot-6  slot-7\n"RESET);
 
   for (int i = 0; i < 31; i++)
     if (status.status[i] != 0)
       {
-	printf ("\n\n%d-%02d-%04d\t", i + 1, status.month, status.year);
+	printf (YEL"\n\n%d-%02d-%04d\t"RESET, i + 1, status.month, status.year);
 	Char_to_Binary (status.status[i]);
       }
 }
@@ -103,17 +130,17 @@ void
 Display_slot (slot info)
 {
 
-  printf ("\n\tBooking Details\n\n");
-  printf ("\tName : %s\n", info.name);
-  printf ("\tContact Number : %s\n\n", info.contact);
+  printf (YEL"\n\tBooking Details\n\n");
+  printf ("\tName : "BLU"%s\n"RESET, info.name);
+  printf (YEL"\tContact Number : "BLU"%s\n\n"RESET, info.contact);
   int day, month, year, hall, slot;
   sscanf (info.booking_id, "%02d-%02d-%04d-%d-%d", &day, &month, &year, &hall,
 	  &slot);
-  printf ("\tDate - %02d/%02d/%d\n\n", day, month, year);
+  printf (YEL"\tDate : "BLU"%02d/%02d/%d\n\n"RESET, day, month, year);
   if (hall == 1)
-    printf ("\tSeminar Hall : Old Seminar Hall\n\n");
+    printf (YEL"\tSeminar Hall : "BLU"Old Seminar Hall\n\n"RESET);
   if (hall == 2)
-    printf ("\tSeminar Hall : New Seminar Hall\n\n");
+    printf (YEL"\tSeminar Hall : "BLU"New Seminar Hall\n\n"RESET);
   char time[12];
   switch (slot)
     {
@@ -139,8 +166,9 @@ Display_slot (slot info)
       strcpy (time, "3PM - 4PM");
       break;
     }
-  printf ("\tSlot Time :  %s\n\n", time);
-  printf ("\tBooking Id : %s\n\n", info.booking_id);
+  printf (YEL"\tSlot Time : "BLU"%s\n\n"RESET, time);
+  printf (YEL"\tBooking Id : "BLU"%s\n\n"RESET, info.booking_id);
+  printf (YEL"\tPurpose : "BLU"%s\n\n"RESET, info.purpose);
   return;
 }
 
@@ -176,9 +204,9 @@ main (int argc, char *argv[])
   cli_sock = socket (AF_INET, SOCK_STREAM, 0);
   if (cli_sock < 0)
     {
-      error ("Error opening a socket!!");
+      error (RED"Error opening a socket!!"RESET);
     }
-  printf ("Socket Created Successfully\n\n");
+  Printf_green("Socket Created Successfully\n\n");
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_port = htons (portno);
   serv_addr.sin_addr.s_addr = inet_addr (argv[1]);
@@ -190,8 +218,8 @@ main (int argc, char *argv[])
 
   if (connect (cli_sock, (struct sockaddr *) &serv_addr, sizeof (serv_addr)) <
       0)
-    error ("Connection Failed");
-  printf ("Connected to server successfully\n\n");
+    error (RED"Connection Failed"RESET);
+  printf (GRN"Connected to server successfully\n\n"RESET);
 /*msg Send;
 strcpy(Send.name,"Bharath");
 strcpy(Send.contact,"123456789");
@@ -208,9 +236,9 @@ while(loop){
   exchange req;
   slot con;
   printf
-    ("\n\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\tWELCOME TO SEMINAR HALL BOOKING APP\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\tChoose the following\n\n\n\t1.Booking\n\n\n\t2.Cancelling by Booking ID\n\n\n\t3.Display Booked Dates in a Month\n\n\n\t4.Exit\n\n");
+    (MAG"\n\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\tWELCOME TO SEMINAR HALL BOOKING APP\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\tChoose the following\n\n\n\t1.Booking\n\n\n\t2.Cancelling by Booking ID\n\n\n\t3.Display Booked Dates in a Month\n\n\n\t4.Exit\n\n"RESET);
   printf
-    ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nChoice : ");
+    ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"CYN"\n\nChoice : "RESET);
   scan (&req.type);
 //  if (req.type == 5)
   //  {exit (0);close(cli_sock);}
@@ -220,12 +248,12 @@ while(loop){
     case 0:
       {
 	printf
-	  ("\n\n\tYou Have chosen For Booking the Hall\n\n\n\tWhich Seminar Hall do You want to Book\n\n\n\t1.Old Seminar Hall\n\n\n\t2.New Seminar Hall\n\n\nChoice? : ");
+	  (CYN"\n\n\tYou Have chosen For Booking the Hall\n\n\n\tWhich Seminar Hall do You want to Book\n\n\n\t1.Old Seminar Hall\n\n\n\t2.New Seminar Hall\n\n\nChoice? : "RESET);
 	scan (&req.hall);
 //    while ((getchar()) != '\n');
 	req.hall -= 1;
-	req.hall ? printf ("\tYou have chosen New Seminar Hall\n") :
-	  printf ("\tYou Have chosen Old Seminar hall\n");
+	req.hall ? printf (CYN"\tYou have chosen New Seminar Hall\n"RESET) :
+	  printf (CYN"\tYou Have chosen Old Seminar hall\n"RESET);
 	/* printf ("Booking type \n1.Single Day\n2.More than one day\n");
 	   scan ( &req.B_day);
 	   //    while ((getchar()) != '\n');
@@ -240,23 +268,23 @@ while(loop){
 	   printf ("Invalid Choice");
 	   exit (1);
 	   } */
-	printf ("\n\n\n\t1.Current Month\n\n\n\t2.Next Month\n\n\tChoice? :");
+	printf (CYN"\n\n\n\t1.Current Month\n\n\n\t2.Next Month\n\n\tChoice? :"RESET);
 	scan (&req.month_type);
 	req.month_type -= 1;
 	req.
-	  month_type ? printf ("\n\n\tYou have chosen Next Month\n") :
-	  printf ("\n\n\tYou have chosen Current Month\n");
-	printf ("\n\n\n\tEnter the date you want to book (1-31) : ");
+	  month_type ? printf (CYN"\n\n\tYou have chosen Next Month\n"RESET) :
+	  printf (CYN"\n\n\tYou have chosen Current Month\n"RESET);
+	printf (CYN"\n\n\n\tEnter the date you want to book (1-31) : "RESET);
 	scan (&req.event_day);
 	req.event_day -= 1;
-	printf ("\n\n\n\tEnter Slot Number(1-7) : ");
+	printf (CYN"\n\n\n\tEnter Slot Number(1-7) : "RESET);
 	scan (&req.slot_no);
 	req.slot_no -= 1;
 	//printf("%d\n%d\n%d\n%d\n%d",req.type,req.hall,req.month_type,req.event_day,req.slot_no);
 	//Send to server for checking
 	n = send (cli_sock, (void *) &req, sizeof (req), 0);
 	if (n < 0)
-	  error ("Error sending Details\nTry again");
+	  error (RED"Error sending Details\nTry again"RESET);
 	//receieve response as slot with booking id and booking status
 	n = recv (cli_sock, (slot *) & con, sizeof (con), 0);
 	if (n < 0)
@@ -264,25 +292,27 @@ while(loop){
 	//if booking status ==0 take details
 	if (con.booking_status == 0)
 	  {
-	printf("Booking id - %s \n\n",con.booking_id);
+	printf(YEL"Booking id :"BLU" %s \n\n"RESET,con.booking_id);
 	    printf
-	      ("\n\n\n\tThe slot is Free\n\n\n\tPlease Provide your Contact Details\n\n\n\tYour Name : ");
+	      (GRN"\n\n\n\tThe slot is Free\n\n\n\t"RESET"Please Provide your Contact Details\n\n\n\t"YEL"Your Name : "RESET);
 	    fgets (con.name, sizeof (con.name), stdin);
-	    printf ("\n\n\n\tContact Number : ");
+	    printf (CYN"\n\n\n\tContact Number : "RESET);
 	    fgets (con.contact, sizeof (con.contact), stdin);
+            printf (CYN"\n\n\n\tPurpose : "RESET);
+	    fgets (con.purpose, sizeof (con.purpose), stdin);
 	    n = send (cli_sock, (void *) &con, sizeof (con), 0);
 	    if (n < 0)
 	      error ("Error sending Details\nTry again");
 	    Display_slot (con);
-	    Printf ("Booking Successfull");
+	    Printf_green ("Booking Successfull");
 
 	  }
 	else
 	  {
 	    printf
-	      ("\n\n\n\tThe Slot Has already been Booked\nDetails Given\n");
+	      (RED"\n\n\n\tThe Slot Has already been Booked\nDetails Given\n"RESET);
 	    Display_slot (con);
-	    Printf ("Booking Failed");
+	    Printf_red (RED"Booking Failed"RESET);
 	  }
 	break;
       }
@@ -321,9 +351,9 @@ while(loop){
     case 1:
       {
 	printf
-	  ("\n\n\tYou have chosen Cancellation by Booking ID..\n\n\n\tEnter Booking ID seperated by '-' :");
+	  (CYN"\n\n\tYou have chosen Cancellation by Booking ID..\n\n\n\tEnter Booking ID seperated by '-' :"RESET);
 	fgets (req.id, sizeof (req.id), stdin);
-	printf ("\n\n\n\tThe Booking ID is %s", req.id);
+	printf (YEL"\n\n\n\tThe Booking ID is "BLU"%s"RESET, req.id);
 	n = send (cli_sock, (void *) &req, sizeof (req), 0);
 	//waiting
 	if (n < 0)
@@ -331,24 +361,24 @@ while(loop){
 	char report[255];
 	n = recv (cli_sock, &report, sizeof (report), 0);
 
-	Printf (report);
+	Printf_red (report);
 	break;
       }
     case 2:
       {
 	printf
-	  ("\n\n\tYou Have chosen to Display the details\n\n\n\tWhich Seminar Hall do You want to display\n\n\n\t1.Old Seminar Hall\n\n\n\t2.New Seminar Hall\n\n\tChoice? ");
+	  (CYN"\n\n\tYou Have chosen to Display the details\n\n\n\tWhich Seminar Hall do You want to display\n\n\n\t1.Old Seminar Hall\n\n\n\t2.New Seminar Hall\n\n\tChoice? "RESET);
 	scan (&req.hall);
 	//    while ((getchar()) != '\n');
 	req.hall -= 1;
-	req.hall ? printf ("\n\nYou have chosen New Seminar Hall\n") :
-	  printf ("\n\nYou Have chosen Old Seminar hall\n");
-	printf ("\n\n\n\t1.Current Month\n\n\n\t2.Next Month\n\n\tChoice? :");
+	req.hall ? printf (CYN"\n\nYou have chosen "BLU"New Seminar Hall\n"RESET) :
+	  printf (CYN"\n\nYou Have chosen "BLU"Old Seminar hall\n"RESET);
+	printf (CYN"\n\n\n\t1.Current Month\n\n\n\t2.Next Month\n\n\tChoice? :"RESET);
 	scan (&req.month_type);
 	req.month_type -= 1;
 	req.
-	  month_type ? printf ("\n\nYou have chosen Next Month\n") :
-	  printf ("\n\nYou have chosen Current Month\n\n\n");
+	  month_type ? printf (CYN"\n\nYou have chosen "BLU"Next Month\n"RESET) :
+	  printf (CYN"\n\nYou have chosen "BLU"Current Month\n\n\n"RESET);
 	n = send (cli_sock, (void *) &req, sizeof (req), 0);
 	if (n < 0)
 	  error ("Error sending Details\nTry again");
@@ -361,7 +391,7 @@ while(loop){
       }
 case 3:
 	{
-	printf("\n\n\nThank You for Using the Application\n\n\tVisit Again\n\n");
+	printf(GRN"\n\n\nThank You for Using the Application\n\n\tVisit Again\n\n"RESET);
 	n = send (cli_sock, (void *) &req, sizeof (req), 0);
         if (n < 0)
           error ("Error sending Details\nTry again");
@@ -371,13 +401,13 @@ case 3:
 	//while
 	}//case
     default:
-      Printf ("Service Not Available");
+      Printf_red (RED"Service Not Available"RESET);
       exit (1);
 
 
     }//switch
 }//while
-  Printf ("\n\nClient Socket Closed\n\n");
+  Printf_red (RED"\n\nClient Socket Closed\n\n"RESET);
   return 0;
 
 }//return

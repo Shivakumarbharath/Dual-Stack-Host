@@ -79,6 +79,7 @@ typedef struct slot
   char name[50];
   char contact[11];
   char booking_id[17];
+  char purpose[20];
 } slot;
 
 
@@ -167,6 +168,7 @@ Display_slot (slot info)
     }
   printf (YEL"\tSlot Time : "BLU"%s\n\n"RESET, time);
   printf (YEL"\tBooking Id : "BLU"%s\n\n"RESET, info.booking_id);
+  printf (YEL"\tPurpose : "BLU"%s\n\n"RESET, info.purpose);
   return;
 }
 
@@ -296,6 +298,8 @@ while(loop){
 	    fgets (con.name, sizeof (con.name), stdin);
 	    printf (CYN"\n\n\n\tContact Number : "RESET);
 	    fgets (con.contact, sizeof (con.contact), stdin);
+            printf (CYN"\n\n\n\tPurpose : "RESET);
+	    fgets (con.purpose, sizeof (con.purpose), stdin);
 	    n = send (cli_sock, (void *) &con, sizeof (con), 0);
 	    if (n < 0)
 	      error ("Error sending Details\nTry again");
