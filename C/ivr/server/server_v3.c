@@ -13,7 +13,7 @@ void error(const char *msg){
 perror(msg);
 exit(1);
 }
-
+//send audio function
 int send_audio(int ser_sock,char *in,struct sockaddr_in6 cli){
     char buffer[BUFFER_SIZE];
 bzero(buffer, BUFFER_SIZE);
@@ -45,6 +45,7 @@ int n;
 
     if (fp != NULL)  
         fclose(fp);
+//confirmation
 int choice;
 int addr_len=sizeof(cli);
 recvfrom(ser_sock, &choice, sizeof(choice), 0, (struct sockaddr*)&cli, &addr_len);
@@ -79,46 +80,65 @@ if(ser_sock<0){error("Error In Socket Creatation");}
 
   bind(ser_sock, (struct sockaddr*)&ser, sizeof(ser));
   addr_size = sizeof(cli);
+//1st exchange to get the address of the client
   recvfrom(ser_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&cli, &addr_size);
   char ip[100];
 if(inet_ntop(AF_INET6,&cli,ip,sizeof(ip))==NULL)error("inet_ntop Error");
 printf("ipv6 Address : %s\t",ip);
 printf("Port Number : %d \n\n\n\n",ntohs(cli.sin6_port));
 printf("[+]Data Received: %s", buffer);
+
+//Welcome Note
 send_audio(ser_sock,"audio/welcome.mp3",cli);
 int choice,converted;
 //recvfrom(ser_sock, &choice, sizeof(choice), 0, (struct sockaddr*)&cli, &addr_size);
+
+//Choice of Service
 send_audio(ser_sock,"audio/option.mp3",cli);
 //int choice,converted;
 recvfrom(ser_sock, &choice, sizeof(choice), 0, (struct sockaddr*)&cli, &addr_size);
 converted=ntohs(choice);
 printf("\n\nThe client Choice is %d\n\n",converted);
+//To provide the service
 switch(converted){
+//Room Availibality Check
+//Choose Boys or Girls hostel
 case 1:send_audio(ser_sock,"audio/boyorgirl.mp3",cli);
 int bg;
 recvfrom(ser_sock, &bg, sizeof(bg), 0, (struct sockaddr*)&cli, &addr_size);
 printf("bg %d\n",ntohs(bg));
+//Get the hostel name
 send_audio(ser_sock,"audio/hname.mp3",cli);
 recvfrom(ser_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&cli, &addr_size);
 printf("name :%s\n\n",buffer);
+//get the floor
 send_audio(ser_sock,"audio/floor.mp3",cli);
 int flr;
 recvfrom(ser_sock, &flr, sizeof(flr), 0, (struct sockaddr*)&cli, &addr_size);
 printf("floor %d\n",ntohs(flr));
-
+//get the room number
 send_audio(ser_sock,"audio/rno.mp3",cli);
 int rno;
 recvfrom(ser_sock, &rno, sizeof(rno), 0, (struct sockaddr*)&cli, &addr_size);
 printf("Room number %d\n",ntohs(rno));
 flr=ntohs(flr);
+
+//Code to check the data base
+
+
+
+
+//since no data base no check
+//send the result
 if(flr==1){send_audio(ser_sock,"audio/notavail.mp3",cli);}
 else{send_audio(ser_sock,"audio/avail.mp3",cli);}
 break;
 default:break;
 }//switch
 
-
+send_audio(ser_sock,"audio/thankyou.mp3",cli);
 
 //close(ser_sock);
 }
+
 

@@ -16,7 +16,7 @@ scanf("%d",p);
 while ((getchar()) != '\n');
 return;
 }
-
+//To recieve the audio file play and delete the file from memory
 int recive_play(int cli_sock,struct sockaddr_in6 serverAddr){
 int n;
 FILE *out;
@@ -43,6 +43,7 @@ system("rm out.mp3");
     if (out != NULL)  
         fclose(out);
 int converted;
+//send confirmation
 sendto(cli_sock, &converted, sizeof(converted), 0, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
 return 0;
 }
@@ -70,17 +71,23 @@ void main(int argc, char **argv){
 if(inet_pton(AF_INET6,argv[1],&serverAddr.sin6_addr)<=0)error("\n inet_pton error occured\n\n");
 
   strcpy(buffer, "Hello Server\n");
+//1st exchange to record the address by the server
   sendto(cli_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
   printf("[+]Data Send: %s", buffer);
+//Play welcome note
   recive_play(cli_sock,serverAddr);
 int choice, converted=0;
 //sendto(cli_sock, &converted, sizeof(converted), 0, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
-  recive_play(cli_sock,serverAddr);
+ 
+//Prompt the choice of service
+ recive_play(cli_sock,serverAddr);
 printf("\n\nChoice ?:");
 //int choice,converted;
 scanf("%d",&choice);
 converted=htons(choice);
   sendto(cli_sock, &converted, sizeof(choice), 0, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+
+//TO process each service request
 switch(choice){
 case 1:recive_play(cli_sock,serverAddr);
 printf("Choice?");
@@ -111,6 +118,7 @@ recive_play(cli_sock,serverAddr);
 break;
 default:break;
 }//switch
+recive_play(cli_sock,serverAddr);
 
 }
 
