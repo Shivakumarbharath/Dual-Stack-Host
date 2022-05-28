@@ -45,6 +45,7 @@ system("rm out.mp3");
 int converted;
 //send confirmation
 sendto(cli_sock, &converted, sizeof(converted), 0, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+system("clear");
 return 0;
 }
 
@@ -137,8 +138,20 @@ convertedbus=htons(0);
  sendto(cli_sock, &convertedbus, sizeof(bus), 0, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
  recive_play(cli_sock,serverAddr);
 break;
+case 3:
+recive_play(cli_sock,serverAddr);
+recive_play(cli_sock,serverAddr);
+recive_play(cli_sock,serverAddr);
+recive_play(cli_sock,serverAddr);
+recive_play(cli_sock,serverAddr);
+recive_play(cli_sock,serverAddr);
+recive_play(cli_sock,serverAddr);
 
-default:break;
+break;
+default:
+recive_play(cli_sock,serverAddr);
+
+break;
 }//switch
 recive_play(cli_sock,serverAddr);
 

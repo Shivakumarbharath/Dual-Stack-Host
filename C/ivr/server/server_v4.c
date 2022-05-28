@@ -153,7 +153,20 @@ send_audio(ser_sock,"audio/0.mp3",cli);
 
 }
 break;
-default:break;
+case 3:
+send_audio(ser_sock,"audio/Bdetails1.mp3",cli);
+send_audio(ser_sock,"audio/Bdetails2.mp3",cli);
+send_audio(ser_sock,"audio/Bdetails3.mp3",cli);
+send_audio(ser_sock,"audio/Bdetails4.mp3",cli);
+send_audio(ser_sock,"audio/Bdetails5.mp3",cli);
+send_audio(ser_sock,"audio/pan.mp3",cli);
+send_audio(ser_sock,"audio/branch.mp3",cli);
+
+break;
+
+default:
+send_audio(ser_sock,"audio/tryagain.mp3",cli);
+break;
 }//switch
 
 send_audio(ser_sock,"audio/thankyou.mp3",cli);
